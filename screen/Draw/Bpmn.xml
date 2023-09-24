@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This software is in the public domain under CC0 1.0 Universal plus a 
+Grant of Patent License.
+
+To the extent possible under law, the author(s) have dedicated all
+copyright and related and neighboring rights to this software to the
+public domain worldwide. This software is distributed without any
+warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication
+along with this software (see the LICENSE.md file). If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+-->
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-include="true" default-menu-title="BPMN" >
+
+    <widgets>
+        <render-mode><text type="html,vuet,qvt"><![CDATA[
+            <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/diagram-js.css" type="text/css"/>
+            <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/bpmn-js.css" type="text/css"/>
+            <link rel="stylesheet" href="https://unpkg.com/bpmn-js@14.0.0/dist/assets/bpmn-font/css/bpmn.css" type="text/css"/>
+
+            <script src="https://unpkg.com/bpmn-js@14.0.0/dist/bpmn-modeler.development.js" type="text/javascript"></script>
+        ]]></text></render-mode>
+
+        <render-mode>
+<!--            <text type="js" location="component://example/screen/ExampleApp/Example/DynamicExampleItems/ExampleItems.js"/>-->
+<!--            <text type="vuet" location="component://example/screen/ExampleApp/Example/DynamicExampleItems/ExampleItems.vuet"/>-->
+            <text type="qjs" location="component://beiyelin-devtools/screen/Draw/Bpmn/Bpmn.qjs"/>
+            <text type="qvt" location="component://beiyelin-devtools/screen/Draw/Bpmn/Bpmn.qvt"/>
+        </render-mode>
+    </widgets>
+</screen>

@@ -1,0 +1,75 @@
+
+<div class="q-pa-md">
+  <q-layout view="hhh LpR fff" container style="height: 800px" class="shadow-2 rounded-borders">
+    <q-header reveal class="bg-accent text-white">
+      <q-toolbar>
+<!--        <q-btn flat @click="leftDrawerOpen = !leftDrawerOpen" round dense icon="menu" />-->
+
+        <q-toolbar-title>
+          <div class="text-center" style="width:100%; height:100%">
+<!--            <q-btn @click="centerContent" outline dense icon="filter_center_focus">-->
+<!--              <q-tooltip >Center Content</q-tooltip>-->
+<!--            </q-btn>-->
+
+<!--            <q-btn @click="undo" outline dense icon="undo" :disable="canUndo">-->
+<!--                <q-tooltip >Undo</q-tooltip>-->
+<!--            </q-btn>-->
+
+<!--            <q-btn @click="redo" outline dense icon="redo" :disable="canRedo">-->
+<!--                <q-tooltip >Redo</q-tooltip>-->
+<!--            </q-btn>-->
+
+          </div>
+        </q-toolbar-title>
+<!--        <q-btn flat @click="rightDrawerOpen = !rightDrawerOpen" round dense icon="menu" />-->
+      </q-toolbar>
+    </q-header>
+
+    <q-footer>
+      <q-toolbar>
+        <q-toolbar-title>Footer</q-toolbar-title>
+      </q-toolbar>
+    </q-footer>
+
+<!--    <q-drawer-->
+<!--            v-model="leftDrawerOpen"-->
+<!--            :width="200"-->
+<!--            :breakpoint="700"-->
+<!--            bordered-->
+<!--            content-class="bg-grey-3"-->
+<!--    >-->
+<!--      <q-scroll-area class="fit">-->
+<!--        <div class="q-pa-sm" ref="stencilContainer">-->
+<!--            Left Drawer-->
+<!--        </div>-->
+<!--      </q-scroll-area>-->
+<!--    </q-drawer>-->
+
+<!--    <q-drawer-->
+<!--            side="right"-->
+<!--            v-model="rightDrawerOpen"-->
+<!--            bordered-->
+<!--            :width="200"-->
+<!--            :breakpoint="500"-->
+<!--            content-class="bg-grey-3"-->
+<!--    >-->
+<!--      <q-scroll-area class="fit">-->
+<!--        <div class="q-pa-sm" ref="miniMap">-->
+<!--            Right Drawer-->
+<!--        </div>-->
+<!--      </q-scroll-area>-->
+<!--    </q-drawer>-->
+
+    <q-page-container>
+      <q-page style="padding-top: 15px" class="q-pa-md">
+        <div style="width:100%; height:665px">
+          <div ref="graphContainer" id="graphContainer">
+
+          </div>
+
+        </div>
+      </q-page>
+
+    </q-page-container>
+  </q-layout>
+</div>

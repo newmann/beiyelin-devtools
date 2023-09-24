@@ -1,0 +1,78 @@
+define("Bpmn", {
+    data: function () { return {
+        splitterModel: 30,
+        leftDrawerOpen: true,
+        rightDrawerOpen: true,
+        graph: null,
+        stencil: null,
+        canRedo: false,
+        canUndo: false
+    } },
+    methods: {
+        initGraph: function(graphContainer){
+
+            this.graph = new BpmnJS({
+                container: graphContainer,
+                keyboard: {
+                  bindTo: window
+                }
+                });
+
+        }
+    },
+    mounted: function () {
+            this.$nextTick(()=>{
+                this.initGraph("#graphContainer");
+                var diagramUrl = 'https://cdn.staticaly.com/gh/bpmn-io/bpmn-js-examples/dfceecba/starter/diagram.bpmn';
+
+
+              /**
+               * Open diagram in our modeler instance.
+               *
+               * @param {String} bpmnXML diagram to display
+               */
+              async function openDiagram(bpmnXML) {
+
+                // import diagram
+                try {
+
+                  await this.graph.importXML(bpmnXML);
+
+                  // access modeler components
+                  var canvas = this.graph.get('canvas');
+                  var overlays = this.graph.get('overlays');
+
+
+                  // zoom to fit full viewport
+                  canvas.zoom('fit-viewport');
+
+                  // attach an overlay to a node
+                  overlays.add('SCAN_OK', 'note', {
+                    position: {
+                      bottom: 0,
+                      right: 0
+                    },
+                    html: '<div class="diagram-note">Mixed up the labels?</div>'
+                  });
+
+                  // add marker
+                  canvas.addMarker('SCAN_OK', 'needs-discussion');
+                } catch (err) {
+
+                  console.error('could not import BPMN 2.0 diagram', err);
+                }
+              }
+
+                // load external diagram file via AJAX and open it
+                $.get(diagramUrl, openDiagram, 'text');
+
+//                this.initStencil(this.$refs.stencilContainer);
+//
+//                this.graph.fromJSON(this.drawData); // 渲染元素
+//                this.graph.centerContent(); // 居中显示
+            })
+
+
+
+    }
+})

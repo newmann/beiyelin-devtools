@@ -1,0 +1,649 @@
+define("FlowDiagram", {
+    data: function () { return {
+        splitterModel: 30,
+        drawerLeft: true,
+        drawerRight: true,
+        graph: null,
+        stencil: null,
+        canRedo: false,
+        canUndo: false,
+
+        drawData: {
+              nodes: [
+                  {
+                    "id": "1",
+                    "shape": "er-rect",
+                    "label": "学生",
+                    "width": 150,
+                    "height": 24,
+                    "position": {
+                      "x": 24,
+                      "y": 150
+                    },
+                    "ports": [
+                      {
+                        "id": "1-1",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "ID"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "1-2",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Name"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "1-3",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Class"
+                          },
+                          "portTypeLabel": {
+                            "text": "NUMBER"
+                          }
+                        }
+                      },
+                      {
+                        "id": "1-4",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Gender"
+                          },
+                          "portTypeLabel": {
+                            "text": "BOOLEAN"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "2",
+                    "shape": "er-rect",
+                    "label": "课程",
+                    "width": 150,
+                    "height": 24,
+                    "position": {
+                      "x": 250,
+                      "y": 210
+                    },
+                    "ports": [
+                      {
+                        "id": "2-1",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "ID"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "2-2",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Name"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "2-3",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "StudentID"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "2-4",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "TeacherID"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "2-5",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Description"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "3",
+                    "shape": "er-rect",
+                    "label": "老师",
+                    "width": 150,
+                    "height": 24,
+                    "position": {
+                      "x": 480,
+                      "y": 350
+                    },
+                    "ports": [
+                      {
+                        "id": "3-1",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "ID"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "3-2",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Name"
+                          },
+                          "portTypeLabel": {
+                            "text": "STRING"
+                          }
+                        }
+                      },
+                      {
+                        "id": "3-3",
+                        "group": "list",
+                        "attrs": {
+                          "portNameLabel": {
+                            "text": "Age"
+                          },
+                          "portTypeLabel": {
+                            "text": "NUMBER"
+                          }
+                        }
+                      }
+                    ]
+                  }
+              ],
+              edges: [
+                  {
+                    "id": "4",
+                    "shape": "edge",
+                    "source": {
+                      "cell": "1",
+                      "port": "1-1"
+                    },
+                    "target": {
+                      "cell": "2",
+                      "port": "2-3"
+                    },
+                    "attrs": {
+                      "line": {
+                        "stroke": "#A2B1C3",
+                        "strokeWidth": 2
+                      }
+                    },
+                    "zIndex": 0
+                  },
+                  {
+                    "id": "5",
+                    "shape": "edge",
+                    "source": {
+                      "cell": "3",
+                      "port": "3-1"
+                    },
+                    "target": {
+                      "cell": "2",
+                      "port": "2-4"
+                    },
+                    "attrs": {
+                      "line": {
+                        "stroke": "#A2B1C3",
+                        "strokeWidth": 2
+                      }
+                    },
+                    "zIndex": 0
+                  }
+              ],
+            }
+    } },
+    methods: {
+        initGraph: function(graphContainer){
+            this.graph = new X6.Graph({
+              container:  graphContainer,
+              autoResize: true,
+              panning: true,
+              mousewheel: {
+                enabled: true,
+                zoomAtMousePosition: true,
+                modifiers: 'ctrl',
+                minScale: 0.5,
+                maxScale: 3,
+              },
+              selecting:{
+                enabled:true,
+                rubberband: true,
+                showNodeSelectionBox: true,
+              },
+              snapline: true,
+              iteracting: {
+                edgeLabelMovable: true
+              },
+              // 设置画布背景颜色
+              background: {
+                color: '#F2F7FA',
+              },
+              keyboard:{
+                enabled: true,
+              },
+
+                grid: {
+                    visible: true,
+                    type: 'doubleMesh',
+                    args: [
+                      {
+                        color: '#eee', // 主网格线颜色
+                        thickness: 1, // 主网格线宽度
+                      },
+                      {
+                        color: '#ddd', // 次网格线颜色
+                        thickness: 1, // 次网格线宽度
+                        factor: 4, // 主次网格线间隔
+                      },
+                    ],
+
+                  },
+                connecting: {
+                    router: {
+                        name:'er',
+                        args: {
+                            offset: 25,
+                            direction: 'H',
+                        },
+                    },
+                    allowBlank: false, //没有终点的连接线自动消失
+                    snap:{
+                        radius: 20, // 离目标 20px 的时候自动吸附
+                    },
+                    connector:{
+                        name: 'rounded',
+                        args: {
+                            radius:8,
+                        }
+                    },
+                    createEdge() {
+                      return new X6.Shape.Edge({
+                        attrs: {
+                          line: {
+                            stroke: '#8f8f8f',
+                            strokeWidth: 1,
+                          },
+                        },
+                      })
+                    },
+                },
+                highlighting: {
+                  magnetAvailable: {
+                    name: 'stroke',
+                    args: {
+                      padding: 4,
+                      attrs: {
+                        strokeWidth: 4,
+                        stroke: '#6a6c8a'
+                      }
+                    }
+                  }
+                },
+            });
+            this.graph.use(
+              new X6PluginMinimap.MiniMap({
+                container: this.$refs.miniMap,
+                        width: 200,
+                        height: 160,
+                        padding: 10,
+              }),
+            );
+            this.graph.use(
+              new X6PluginHistory.History({
+                enabled: true,
+              }),
+            );
+            this.canRedo = this.graph.canRedo();
+            this.canUndo = this.graph.canUndo();
+
+          // 鼠标移入移出节点
+          this.graph.on('node:mouseenter',X6.FunctionExt.debounce(() => {
+            const container =  document.getElementById('graphContainer')
+            const ports = container.querySelectorAll(
+              '.x6-port-body'
+            )
+            this.showPorts(ports, true)
+          }), 500)
+          this.graph.on('node:mouseleave', () => {
+            const container =  document.getElementById('graphContainer')
+            const ports = container.querySelectorAll(
+              '.x6-port-body'
+            )
+            this.showPorts(ports, false)
+          })
+          this.graph.on('blank:click', () => {
+            this.type = 'grid'
+          })
+          this.graph.on('cell:click', ({ cell }) => {
+            this.type = cell.isNode() ? 'node' : 'edge'
+          })
+          this.graph.on('selection:changed', (args) => {
+            args.added.forEach(cell => {
+              this.selectCell = cell
+              if(cell.isEdge()){
+                cell.isEdge() && cell.attr('line/strokeDasharray', 5) //虚线蚂蚁线
+                cell.addTools([
+                  {
+                    name: 'vertices',
+                    args: {
+                      padding: 4,
+                      attrs: {
+                        strokeWidth: 0.1,
+                        stroke: '#2d8cf0',
+                        fill: '#ffffff',
+                      }
+                    }
+                  }
+                ])
+              }
+            })
+            args.removed.forEach(cell => {
+              cell.isEdge() && cell.attr('line/strokeDasharray', 0)  //正常线
+              cell.removeTools()
+            })
+          })
+
+            const LINE_HEIGHT = 24
+            const NODE_WIDTH = 150
+            X6.Graph.registerPortLayout(
+              'erPortPosition',
+              (portsPositionArgs) => {
+                return portsPositionArgs.map((_, index) => {
+                  return {
+                    position: {
+                      x: 0,
+                      y: (index + 1) * LINE_HEIGHT,
+                    },
+                    angle: 0,
+                  }
+                })
+              },
+              true,
+            )
+
+            X6.Graph.registerNode(
+              'er-rect',
+              {
+                inherit: 'rect',
+                markup: [
+                  {
+                    tagName: 'rect',
+                    selector: 'body',
+                  },
+                  {
+                    tagName: 'text',
+                    selector: 'label',
+                  },
+                ],
+                attrs: {
+                  rect: {
+                    strokeWidth: 1,
+                    stroke: '#5F95FF',
+                    fill: '#5F95FF',
+                  },
+                  label: {
+                    fontWeight: 'bold',
+                    fill: '#ffffff',
+                    fontSize: 12,
+                  },
+                },
+                ports: {
+                  groups: {
+                    list: {
+                      markup: [
+                        {
+                          tagName: 'rect',
+                          selector: 'portBody',
+                        },
+                        {
+                          tagName: 'text',
+                          selector: 'portNameLabel',
+                        },
+                        {
+                          tagName: 'text',
+                          selector: 'portTypeLabel',
+                        },
+                      ],
+                      attrs: {
+                        portBody: {
+                          width: NODE_WIDTH,
+                          height: LINE_HEIGHT,
+                          strokeWidth: 1,
+                          stroke: '#5F95FF',
+                          fill: '#EFF4FF',
+                          magnet: true,
+                        },
+                        portNameLabel: {
+                          ref: 'portBody',
+                          refX: 6,
+                          refY: 6,
+                          fontSize: 10,
+                        },
+                        portTypeLabel: {
+                          ref: 'portBody',
+                          refX: 95,
+                          refY: 6,
+                          fontSize: 10,
+                        },
+                      },
+                      position: 'erPortPosition',
+                    },
+                  },
+                },
+              },
+              true,
+            )
+
+            X6.Graph.registerNode(
+                          'custom-rect-width-port',
+                          {
+                            inherit: 'rect',
+                            width: 80,
+                            height: 40,
+                            attrs: {
+                              body: {
+                                stroke: '#8f8f8f',
+                                strokeWidth: 1,
+                                fill: '#fff',
+                                rx: 6,
+                                ry: 6,
+                              },
+                            },
+                            ports: {
+                              groups: {
+                                top: {
+                                  position: 'top',
+                                  attrs: {
+                                    circle: {
+                                      magnet: true,
+                                      stroke: '#8f8f8f',
+                                      r: 5,
+                                    },
+                                  },
+                                },
+                                bottom: {
+                                  position: 'bottom',
+                                  attrs: {
+                                    circle: {
+                                      magnet: true,
+                                      stroke: '#8f8f8f',
+                                      r: 5,
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                          true,
+                        )
+        },
+
+        initStencil: function(stencilContainer){
+            this.stencil = new X6PluginStencil.Stencil({
+                        title: 'Stencil',
+                        target: this.graph,
+                        search(cell, keyword){ return cell.shape.indexOf(keyword) !== -1 },
+                        placeholder: 'Search by shape name',
+                        notFoundText: 'Not Found',
+                        collapsable: true,
+                        stencilGraphHeight: 0,
+
+                        groups: [
+                            {
+                              name: 'group1',
+                              title: 'Group1',
+                            },
+                            {
+                              name: 'group2',
+                              title: 'Group2',
+                            },
+                            {
+                              name: 'group3',
+                              title: 'Group3',
+                            },
+
+                        ],
+                    })
+
+            stencilContainer.appendChild(this.stencil.container);
+
+            const commonAttrs = {
+              body: {
+                fill: '#fff',
+                stroke: '#8f8f8f',
+                strokeWidth: 1,
+              },
+            }
+
+
+            const n1 = this.graph.createNode({
+              shape: 'custom-rect-width-port',
+              x: 40,
+              y: 40,
+              width: 80,
+              height: 40,
+              label: 'custom-rect',
+              attrs: commonAttrs,
+            })
+
+            const n2 = this.graph.createNode({
+              shape: 'circle',
+              x: 180,
+              y: 40,
+              width: 40,
+              height: 40,
+              label: 'circle',
+              attrs: commonAttrs,
+            })
+
+            const n3 = this.graph.createNode({
+              shape: 'ellipse',
+              width: 80,
+              height: 40,
+              label: 'ellipse',
+              attrs: commonAttrs,
+            })
+
+            const n4 = this.graph.createNode({
+              shape: 'path',
+              width: 40,
+              height: 40,
+              // https://www.svgrepo.com/svg/13653/like
+              path: 'M24.85,10.126c2.018-4.783,6.628-8.125,11.99-8.125c7.223,0,12.425,6.179,13.079,13.543c0,0,0.353,1.828-0.424,5.119c-1.058,4.482-3.545,8.464-6.898,11.503L24.85,48L7.402,32.165c-3.353-3.038-5.84-7.021-6.898-11.503c-0.777-3.291-0.424-5.119-0.424-5.119C0.734,8.179,5.936,2,13.159,2C18.522,2,22.832,5.343,24.85,10.126z',
+              attrs: commonAttrs,
+              label: 'path',
+            })
+
+            const er = this.graph.createNode({
+              shape: 'er-rect',
+              width: 80,
+              height: 40,
+              label: 'ER-Rect',
+              attrs: commonAttrs,
+            })
+
+            this.stencil.load([n1, n2], 'group1')
+            this.stencil.load([n3, n4], 'group2')
+            this.stencil.load([er], 'group3')
+        },
+
+        centerContent: function(){
+            this.graph.centerContent(); // 居中显示
+        },
+        undo: function(){
+            if(this.graph.canUndo()){
+                this.graph.undo();
+                this.canUndo = this.graph.canUndo();
+            }
+
+        },
+        redo: function(){
+            if(this.graph.canRedo()){
+                this.graph.redo();
+                this.canRedo = this.graph.canRedo();
+            }
+        },
+        showPorts (ports, show) {
+            for (let i = 0, len = ports.length; i < len; i = i + 1) {
+              ports[i].style.visibility = show ? 'visible' : 'hidden'
+            }
+        },
+
+    },
+    mounted: function () {
+            this.$nextTick(()=>{
+                this.initGraph(this.$refs.graphContainer);
+                this.initStencil(this.$refs.stencilContainer);
+
+                this.graph.fromJSON(this.drawData); // 渲染元素
+                this.graph.centerContent(); // 居中显示
+            })
+
+
+
+    }
+})

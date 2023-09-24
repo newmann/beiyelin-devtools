@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This software is in the public domain under CC0 1.0 Universal plus a 
+Grant of Patent License.
+
+To the extent possible under law, the author(s) have dedicated all
+copyright and related and neighboring rights to this software to the
+public domain worldwide. This software is distributed without any
+warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication
+along with this software (see the LICENSE.md file). If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+-->
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Run" default-menu-index="2">
+
+    <parameter name="serviceName"/>
+
+    <transition name="run" begin-transaction="false">
+        <actions>
+            <script>
+                org.moqui.context.ExecutionContext ec = context.ec
+
+//                ec.getLogger().info('ServiceDefine: ' + ec.service.getServiceDefinition(serviceName).getInParameterNames().toString())
+
+                inParaValueList = new HashMap()
+                inParaList = ec.service.getServiceDefinition(serviceName).getInParameterNames()
+                for(inPara in inParaList){
+//                    ec.logger.info(inPara + ":" + ec.getContext().getByString(inPara).toString() )
+
+                    if (ec.getContext().getByString(inPara)){
+                        inParaValueList.put(inPara, ec.getContext().getByString(inPara).toString())
+                    }
+                }
+                pStr = new groovy.json.JsonBuilder(inParaValueList).toString()
+
+
+                oldLog = ec.entity.find("mantle.devtools.service.RunServiceLog").condition("serviceName",serviceName)
+                    .condition("parameterStr",pStr).one()
+                try{
+                    if(oldLog){
+                        ec.service.sync().name("update#mantle.devtools.service.RunServiceLog")
+                            .parameter("runServiceLogId",oldLog.getString("runServiceLogId"))
+                            .parameter("lastRunTime",ec.user.getNowTimestamp())
+                            .call()
+                    }else{
+                        ec.service.sync().name("create#mantle.devtools.service.RunServiceLog")
+                            .parameter("serviceName", serviceName)
+                            .parameter("parameterStr",pStr)
+                            .call()
+                    }
+                } catch (Exception e){
+                    ec.logger.error(e.getMessage(),e)
+                }
+
+                serviceResults = ec.service.sync().name(serviceName).parameters(context).call()
+                if (serviceResults) {
+                    StringBuilder sb = new StringBuilder("Service Run Results:\n")
+                    for (def resultEntry in serviceResults) sb.append("==> ${resultEntry.key}: ${resultEntry.value?.toString()}\n")
+                    ec.logger.info(sb.toString())
+
+                    // save the results to display on the screen in the next request (after the transition redirect)
+                    ec.webImpl?.saveParametersToSession(serviceResults)
+                }
+            </script>
+        </actions>
+        <default-response url="." save-parameters="true"><parameter name="doingRun" value="Y"/></default-response>
+    </transition>
+    <transition name="deleteRunLog">
+        <parameter name="runServiceLogId" required="true"/>
+        <parameter name="serviceName" required="true"/>
+        <actions>
+            <entity-delete-by-condition entity-name="mantle.devtools.service.RunServiceLog">
+                <econdition field-name="runServiceLogId"/>
+            </entity-delete-by-condition>
+        </actions>
+        <default-response url="."></default-response>
+    </transition>
+    <transition name="processRunLog">
+        <parameter name="runServiceLogId" required="true"/>
+        <parameter name="serviceName" required="true"/>
+        <actions>
+        </actions>
+        <default-response  url="." save-parameters="true">
+            <parameter name="doingRun" value="N"/>
+            <parameter name="reLoad" value="Y"/>
+        </default-response>
+    </transition>
+    <actions>
+        <if condition="runServiceLogId &amp;&amp; reLoad == 'Y'">
+            <entity-find-one entity-name="mantle.devtools.service.RunServiceLog" value-field="logRecord"/>
+            <script>
+                org.moqui.context.ExecutionContext ec = context.ec
+
+
+                ec.logger.info(logRecord.parameterStr)
+
+                runLogParameter = new groovy.json.JsonSlurper().parseText(logRecord.parameterStr)
+                runLogParameter.put("serviceName",serviceName)
+
+                ec.logger.info(runLogParameter.toString())
+//                    ec.logger.info(pStr.getClass().toString())
+//
+//                    ec.context.putAll(pStr)
+//                    ec.logger.info(ec.context.getByString("enumGroupEnumId").toString())
+            </script>
+
+        </if>
+    </actions>
+    <widgets>
+        <form-single name="SelectServiceInput" transition=".">
+            <field name="serviceName"><default-field title="Service Name (path.verb#noun)">
+                <text-line size="80"/></default-field></field>
+            <field name="submitButton"><default-field title="Select Service"><submit/></default-field></field>
+            <field-layout><field-row-big><field-ref name="serviceName"/><field-ref name="submitButton"/></field-row-big></field-layout>
+        </form-single>
+        <section name="ServiceResultsSection" condition="serviceName &amp;&amp; doingRun == 'Y'">
+            <widgets>
+                <label text="Results for Service: ${serviceName}" type="h3"/>
+                <form-single name="ServiceResults" dynamic="true">
+                    <auto-fields-service service-name="${serviceName}" field-type="display" include="out"/>
+                    <field name="serviceName"><default-field><hidden/></default-field></field>
+                </form-single>
+            </widgets>
+        </section>
+        <section name="ServiceParametersSection" condition="serviceName"><widgets>
+            <label text="Run Service: ${serviceName}" type="h3"/>
+            <form-single name="ServiceParameters" transition="run" dynamic="true" map="runLogParameter">
+                <field name="serviceName"><default-field><hidden/></default-field></field>
+                <auto-fields-service service-name="${serviceName}" include="in" field-type="edit"/>
+                <field name="submitButton"><default-field title="Run Service"><submit/></default-field></field>
+
+                <!-- no longer supported, has not been supported since Quartz Scheduler was removed in 2016
+                <field name="cronString"><default-field tooltip="Enter a cron string to schedule instead of running immediately">
+                    <text-line size="20"/></default-field></field>
+                -->
+            </form-single>
+        </widgets></section>
+        <section name="RunServiceLogSection" condition="serviceName">
+            <widgets>
+                <label text="Run Log: ${serviceName}" type="h3"/>
+                <form-list name="ServiceRunLogList" list="runLogList" list-entry="runLog" transition="processRunLog">
+                    <entity-find entity-name="mantle.devtools.service.RunServiceLog" list="runLogList">
+                        <econdition field-name="serviceName"/>
+                        <order-by field-name="-lastRunTime"/>
+                    </entity-find>
+                    <field name="runServiceLogId">
+                        <default-field>
+                            <hidden/>
+                        </default-field>
+                    </field>
+                    <field name="serviceName">
+                        <default-field>
+                            <hidden/>
+                        </default-field>
+                    </field>
+                    <field name="lastRunTime">
+                        <default-field title="Last Run Time">
+                            <display format="yyyy.MM.dd HH:mm"/>
+                        </default-field>
+                    </field>
+                    <field name="parameterStr">
+                        <default-field title="Run Parameter">
+                            <display/>
+                        </default-field>
+                    </field>
+                    <field name="reloadButton">
+                        <header-field title="Action">
+
+                        </header-field>
+                        <default-field title="" tooltip="reload">
+                            <submit icon="fa fa-repeat"/>
+                            <link url="deleteRunLog" text=" " icon="fa fa-trash" confirmation="Really remove?" tooltip="delete">
+                                <parameter name="runServiceLogId"/><parameter name="serviceName"/></link>
+
+                        </default-field>
+                    </field>
+<!--                    <field name="deleteButton"><default-field title="">-->
+<!--                        <link url="deleteRunLog" text=" " icon="fa fa-trash" confirmation="Really remove?" tooltip="delete">-->
+<!--                            <parameter name="runServiceLogId"/><parameter name="serviceName"/></link></default-field></field>-->
+<!--                    <form-list-column>-->
+<!--                        <field-ref name="lastRunTime"/>-->
+<!--                    </form-list-column>-->
+<!--                    <form-list-column>-->
+<!--                        <field-ref name="parameterStr"/>-->
+<!--                    </form-list-column>-->
+<!--                    <form-list-column >-->
+<!--                        <field-ref name="reloadButton"/>-->
+<!--                        <field-ref name="deleteButton"/>-->
+<!--                    </form-list-column>-->
+
+                </form-list>
+
+            </widgets>
+        </section>
+    </widgets>
+</screen>
