@@ -102,6 +102,39 @@ along with this software (see the LICENSE.md file). If not, see
                     </container>
                 </container>
             </row-col>
+            <row-col sm="2" style="text-center">
+                <container>
+                    <link url="//${appRoot}/Service/ServiceReference" link-type="anchor">
+                        <image url="/b/images/service-1.png" url-type="screen" style="invertible"
+                               width="40"/>
+                    </link>
+                    <container>
+                        <link text="Service Reference" url="//${appRoot}/Service/ServiceReference" link-type="anchor"/>
+                    </container>
+                </container>
+            </row-col>
+            <row-col sm="2" style="text-center">
+                <container>
+                    <link url="//${appRoot}/Service/ServiceViewer" link-type="anchor">
+                        <image url="/b/images/service-1.png" url-type="screen" style="invertible"
+                               width="40"/>
+                    </link>
+                    <container>
+                        <link text="Service Viewer" url="//${appRoot}/Service/ServiceViewer" link-type="anchor"/>
+                    </container>
+                </container>
+            </row-col>
+            <row-col sm="2" style="text-center">
+                <container>
+                    <link url="//${appRoot}/Service/ServiceRun" link-type="anchor">
+                        <image url="/b/images/service-1.png" url-type="screen" style="invertible"
+                               width="40"/>
+                    </link>
+                    <container>
+                        <link text="Service Run" url="//${appRoot}/Service/ServiceRun" link-type="anchor"/>
+                    </container>
+                </container>
+            </row-col>
             <row-col sm="1">
                 <label text="&amp;nbsp;" encode="false"/>
             </row-col>
@@ -136,7 +169,7 @@ along with this software (see the LICENSE.md file). If not, see
                 <label text="&amp;nbsp;" encode="false"/>
             </row-col>
             <row-col sm="2" style="text-center">
-                <container>
+                <container >
                     <link url="//${appRoot}/ScreenCapture" link-type="anchor">
                         <image url="/b/images/capture-1.png" url-type="screen" style="invertible"
                                width="40"/>

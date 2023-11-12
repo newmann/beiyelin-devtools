@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This software is in the public domain under CC0 1.0 Universal plus a 
+Grant of Patent License.
+
+To the extent possible under law, the author(s) have dedicated all
+copyright and related and neighboring rights to this software to the
+public domain worldwide. This software is distributed without any
+warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication
+along with this software (see the LICENSE.md file). If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+-->
+<screen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://moqui.org/xsd/xml-screen-3.xsd"
+        default-menu-title="Service Viewer" default-menu-index="2" render-modes="qjs,qvt">
+
+    <transition name="serviceDetail">
+        <default-response url="../ServiceDetail"/>
+    </transition>
+    <transition name="serviceRun">
+        <default-response url="../ServiceRun"/>
+    </transition>
+
+    <transition name="getRootNodes" read-only="true">
+        <actions>
+            <script>
+                rootNodes= ec.service.getAllServiceInfo(1)
+                ec.web.sendJsonResponse(rootNodes)
+            </script>
+
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+    <transition name="getRootNodes" read-only="true">
+        <actions>
+            <script>
+                rootNodes= ec.service.getAllServiceInfo(1)
+                ec.web.sendJsonResponse(rootNodes)
+            </script>
+
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+    <transition name="getSubNodes" read-only="true">
+        <parameter name="pathStr" required="true"/>
+        <actions>
+            <script><![CDATA[
+                import org.moqui.util.CollectionUtilities
+
+                pathStrLength = pathStr.length()
+
+                Map<String, Map> serviceInfoMap = [:]
+                for (String serviceName in ec.service.getKnownServiceNames()) {
+
+                    if(serviceName.length()< pathStrLength) continue
+
+                    String curSn = serviceName.substring(0, pathStrLength)
+                    if (curSn.equalsIgnoreCase(pathStr)){
+                        //取下一个pathStr
+                        nextDotIndex = serviceName.indexOf(".", pathStrLength + 1)
+
+                        String name = nextDotIndex == -1 ? serviceName : serviceName.substring(0, nextDotIndex)
+
+                        Map curInfo = serviceInfoMap.get(name)
+
+                        if (curInfo) {
+//                            ec.logger.warn(curInfo.toString())
+
+                            CollectionUtilities.addToBigDecimalInMap("services", 1.0, curInfo)
+                        } else {
+                            serviceInfoMap.put(name, [name:name, services:1])
+                        }
+                    }
+                }
+                TreeSet<String> nameSet = new TreeSet(serviceInfoMap.keySet())
+                List<Map> serviceInfoList = []
+                for (String name in nameSet) serviceInfoList.add(serviceInfoMap.get(name))
+                ec.web.sendJsonResponse(serviceInfoList)
+                ]]></script>
+
+        </actions>
+        <default-response type="none"/>
+    </transition>
+
+<!--    <actions>-->
+<!--        <set field="pageSize" from="pageSize ?: 40"/>-->
+<!--        <set field="knownServiceNames" from="ec.service.knownServiceNames"/>-->
+<!--        <set field="filteredServiceNames" from="new ArrayList(knownServiceNames)"/>-->
+<!--        <script>-->
+<!--        if (serviceName) {-->
+<!--            Iterator theIterator = filteredServiceNames.iterator()-->
+<!--            while (theIterator.hasNext()) {-->
+<!--                String curSn = (String) theIterator.next()-->
+<!--                if (!curSn.toUpperCase().contains(serviceName.toUpperCase())) theIterator.remove()-->
+<!--            }-->
+<!--        }-->
+
+<!--        paginateList("filteredServiceNames", null, context)-->
+
+<!--//        ec.getLogger().info('confXmlRoot: '+ec.getFactory().confXmlRoot.first("service-facade").children("service-file").toString())-->
+
+<!--//        si= ec.service.getAllServiceInfo(1)-->
+<!--//-->
+<!--//        ec.getLogger().info('ec.service.getAllServiceInfo(1)')-->
+<!--//        ec.getLogger().info(si.toString())-->
+
+<!--        </script>-->
+<!--    </actions>-->
+    <widgets>
+        <render-mode>
+            <text type="qjs" location="component://beiyelin-devtools/screen/Service/ServiceViewer/ServiceViewer.qjs"/>
+            <text type="qvt" location="component://beiyelin-devtools/screen/Service/ServiceViewer/ServiceViewer.qvt"/>
+        </render-mode>
+    </widgets>
+</screen>

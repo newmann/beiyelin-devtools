@@ -56,6 +56,28 @@ along with this software (see the LICENSE.md file). If not, see
         </container>
         <container-box type="primary">
             <box-header title="Entity Detail for ${entityDefinition.getPrettyName(null, null)} (${entityDefinition.fullEntityName})"/>
+            <box-toolbar>
+                <container>
+                    <render-mode>
+                        <text type="qvt"><![CDATA[
+                                                    <q-btn dense outline no-caps onclick="
+                                                        navigator.clipboard.writeText('${entityDefinition.fullEntityName}').then(
+                                                              function () {
+                                                                moqui.notifyGrowl({type:'success',topic:'Copy Path',title:'Copy full entity name Successful!' });
+                                                              },
+                                                              function () {
+                                                                moqui.notifyGrowl({type:'danger', topic:'Copy Path',title:'Copy entity name Fail!'});
+                                                              },
+                                                            )
+                                                    " >
+                                                        <i class="fa  fa-clipboard"></i>
+                                                        <q-tooltip>${ec.getResource().expand("Copy full entity name","")}</q-tooltip>
+                                                    </q-btn>
+
+                                                ]]></text>
+                    </render-mode>
+                </container>
+            </box-toolbar>
             <box-body >
 <!--                <container type="hr"/>-->
                 <container-row>
@@ -83,10 +105,10 @@ along with this software (see the LICENSE.md file). If not, see
                     <field name="fieldName" from="fieldInfo.name"><default-field><display/></default-field></field>
                     <field name="type" from="fieldInfo.type"><default-field><display/></default-field></field>
                     <field name="column" from="entityDefinition.getColumnName(fieldInfo.name)"><default-field><display/></default-field></field>
-                    <field name="isPk" from="fieldInfo.isPk"><default-field title="Is PK"><display style="${fieldInfo.isPk ? 'text-success':''}"/></default-field></field>
+                    <field name="isPk" from="fieldInfo.isPk"><default-field title="Is PK"><display text="${fieldInfo.isPk ? 'Y':' '}" style="${fieldInfo.isPk ? 'text-success':''}"/></default-field></field>
                     <field name="audit" from="fieldInfo.enableAuditLog"><default-field><display style="${fieldInfo.enableAuditLog ? 'text-danger':''}"/></default-field></field>
-                    <field name="encrypt" from="fieldInfo.encrypt"><default-field><display/></default-field></field>
-                    <field name="localize" from="fieldInfo.enableLocalization"><default-field><display/></default-field></field>
+                    <field name="encrypt" from="fieldInfo.encrypt"><default-field><display text="${fieldInfo.encrypt ? 'Y':' '}"/></default-field></field>
+                    <field name="localize" from="fieldInfo.enableLocalization"><default-field><display text="${fieldInfo.enableLocalization ? 'Y':' '}"/></default-field></field>
                     <field name="default" from="fieldInfo.defaultStr"><default-field><display/></default-field></field>
                     <field name="description" from="fieldInfo.fieldNode.first('description')?.text ?: ''"><default-field><display/></default-field></field>
                 </form-list>
@@ -98,6 +120,7 @@ along with this software (see the LICENSE.md file). If not, see
                     <box-header title="Related Entities"/>
                     <box-body>
                         <form-list name="RelatedEntities" list="relationshipInfoList" list-entry="relInfo">
+                            <field name="keyMap"><default-field><display/></default-field></field>
                             <field name="prettyName"><default-field><display/></default-field></field>
                             <field name="shortAlias"><default-field><display/></default-field></field>
                             <field name="title"><default-field><display/></default-field></field>
@@ -105,7 +128,7 @@ along with this software (see the LICENSE.md file). If not, see
                                 <link text="${relInfo.relatedEntityName}" url="." link-type="anchor"><parameter name="selectedEntity" from="relInfo.relatedEntityName"/></link>
                             </default-field></field>
                             <field name="type"><default-field><display/></default-field></field>
-                            <field name="keyMap"><default-field><display/></default-field></field>
+
                             <field name="link">
                                 <default-field title="">
 

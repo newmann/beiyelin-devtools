@@ -93,11 +93,17 @@ along with this software (see the LICENSE.md file). If not, see
             </field>
             <field name="entityName">
                 <header-field show-order-by="true"/>
-                <default-field><display also-hidden="false"/></default-field>
+                <default-field>
+<!--                    <display also-hidden="false"/>-->
+                    <link url="detail" text="${entityName}" link-type="anchor" parameter-map="[selectedEntity:fullEntityName]"/>
+                </default-field>
             </field>
             <field name="isView">
                 <header-field title="View##DataBase" show-order-by="true"/>
-                <default-field><display also-hidden="false"/></default-field>
+                <conditional-field condition="isView == 'false'">
+                    <display text=" " />
+                </conditional-field>
+                <default-field><display text="Y"  also-hidden="false"/></default-field>
             </field>
             <field name="find"><default-field>
                 <link url="find" text="Find" link-type="anchor" parameter-map="[selectedEntity:fullEntityName]"/>
@@ -105,9 +111,9 @@ along with this software (see the LICENSE.md file). If not, see
             <field name="autoScreen"><default-field>
                 <link url="autoScreen" text="Auto Screen" link-type="anchor" parameter-map="[aen:fullEntityName]"/>
             </default-field></field>
-            <field name="detail"><default-field>
-                <link url="detail" text="Detail" link-type="anchor" parameter-map="[selectedEntity:fullEntityName]"/>
-            </default-field></field>
+<!--            <field name="detail"><default-field>-->
+<!--                <link url="detail" text="Detail" link-type="anchor" parameter-map="[selectedEntity:fullEntityName]"/>-->
+<!--            </default-field></field>-->
         </form-list>
     </widgets>
 </screen>

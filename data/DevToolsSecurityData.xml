@@ -20,14 +20,17 @@ along with this software (see the LICENSE.md file). If not, see
 
     <!-- Artifact group for all of the Example application via the ExampleApp screen (the root screen for the app) -->
     <moqui.basic.Enumeration description="DevTools App" enumId="UgtDevTools" enumTypeId="UserGroupType"/>
+
+    <moqui.security.ArtifactGroup artifactGroupId="DevTools" description="Dev Tools"/>
+    <moqui.security.ArtifactGroupMember artifactGroupId="DevTools" artifactTypeEnumId="AT_XML_SCREEN"
+                                        inheritAuthz="Y" artifactName="component://beiyelin-devtools/screen/DevTools.xml"/>
+
     <!-- Administrators User Group -->
     <userGroups userGroupId="DevToolsAdmin" description="Dev Tools Administrators" groupTypeEnumId="UgtDevTools">
         <authz artifactAuthzId="DevToolsAdminAccount" artifactGroupId="DevTools" authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>
     </userGroups>
 
-        <moqui.security.ArtifactGroup artifactGroupId="DevTools" description="Dev Tools"/>
-        <moqui.security.ArtifactGroupMember artifactGroupId="DevTools" artifactTypeEnumId="AT_XML_SCREEN"
-                inheritAuthz="Y" artifactName="component://beiyelin-devtools/screen/DevTools.xml"/>
+
         <!-- Full permissions for the ADMIN user group -->
         <moqui.security.ArtifactAuthz artifactAuthzId="DevTools_AUTHZ_ALL" userGroupId="ADMIN" artifactGroupId="DevTools"
                 authzTypeEnumId="AUTHZT_ALWAYS" authzActionEnumId="AUTHZA_ALL"/>

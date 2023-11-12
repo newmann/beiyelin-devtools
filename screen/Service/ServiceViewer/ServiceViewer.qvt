@@ -1,0 +1,54 @@
+<div>
+    <q-splitter
+      v-model="splitterModel"
+      style="height: 100%"
+    >
+
+        <template v-slot:before>
+            <div class="q-pa-md q-gutter-sm">
+                <q-input ref="filter" filled v-model="filter" label="Filter">
+                    <template v-slot:append>
+                        <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetFilter" />
+                    </template>
+                </q-input>
+                <q-tree
+                    :nodes="serviceNodes"
+                    default-expand-all
+                    node-key="nodeKey"
+                    :filter="filter"
+                    selected-color="primary"
+                    :selected.sync="selected"
+                    @update:selected = "onNodeSelected"
+                    @lazy-load="onLazyLoad"
+                >
+                    <template v-slot:header-root="prop">
+                        <div class="row items-center">
+                            <div>
+                                {{ prop.node.label }}
+                                <q-badge outline color="orange">{{prop.node.serviceCount}}</q-badge>
+                            </div>
+
+                        </div>
+                    </template>
+                </q-tree>
+
+            </div>
+        </template>
+
+      <template v-slot:separator>
+        <q-avatar color="primary" text-color="white" size="40px" icon="drag_indicator" />
+      </template>
+
+      <template v-slot:after>
+        <div style="width:100%; height:100%">
+<!--            <div >Selected: {{selected? selected: "No selected!"}}</div>-->
+<!--            <div >typeOf: {{typeof selected}}</div>-->
+<!--            <div >computed: {{scriptUrl}}</div>-->
+<!--            <div >parseHref: {{moqui.makeHref(moqui.parseHref(scriptUrl))}}</div>-->
+            <m-dynamic-container id="displayServiceScript" :url="scriptUrl" />
+
+        </div>
+      </template>
+
+    </q-splitter>
+</div>

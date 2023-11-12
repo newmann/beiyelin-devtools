@@ -1,0 +1,94 @@
+define("ServiceViewer", {
+    data: function () { return {
+        splitterModel: 30,
+        selected: '',
+        filter: '',
+        serviceNodes: [
+        ],
+
+    } },
+    computed: {
+        scriptUrl: function() {
+                if(this.selected == null ) return "";
+                if(this.selected && this.selected.indexOf("#") != -1 ){
+                    return "/apps/DevTools/Service/ServiceDetail?serviceName=" + this.selected.split("#").join("%23")
+                } else {
+                    return "";
+                }
+        }
+    },
+    methods: {
+        onLazyLoad ({ node, key, done, fail }) {
+          // call fail() if any error occurs
+//            var vm = this;
+          setTimeout(() => {
+
+            const pathStr = node.nodeKey
+            $.ajax({ type:"GET", url:"/apps/DevTools/Service/ServiceViewer/getSubNodes",
+                     data:{pathStr:pathStr }, dataType:"json", headers:{ Accept:'application/json' },
+                     error:moqui.handleAjaxError,
+                     success: function(responseObj, status, jqXHR) {
+
+                        if(responseObj && responseObj.length>0){
+                            nodeList = []
+//                            console.log(responseObj);
+                            responseObj.forEach(function(item){
+
+                                nodeItem = {};
+                                nodeItem.nodeKey= item.name
+                                nodeItem.serviceCount = item.services;
+
+                                const hashIndex = item.name.indexOf('#');
+                                if (hashIndex == -1) {
+                                     const lastDotIndex = item.name.lastIndexOf('.')
+                                     const label = lastDotIndex == -1 ? item.name:  item.name.substring(lastDotIndex+1)
+                                     nodeItem.label = label
+                                     nodeItem.lazy = true;
+                                     nodeItem.header = 'root';
+                                }else{
+                                    nodeItem.label = item.name
+                                }
+
+                                nodeList.push(nodeItem)
+                            })
+                            done(nodeList);
+                        }
+                     }});
+          }, 100)
+        },
+        resetFilter () {
+          this.filter = ''
+          this.$refs.filter.focus()
+        },
+        onNodeSelected(target){
+            console.log(target)
+        },
+    },
+    mounted: function () {
+        //获取根节点
+        var vm = this;
+        $.ajax({ type:"GET", url:"/apps/DevTools/Service/ServiceViewer/getRootNodes",
+                 data:{ }, dataType:"json", headers:{ Accept:'application/json' },
+                 error:moqui.handleAjaxError,
+                 success: function(responseObj, status, jqXHR) {
+
+                    if(responseObj && responseObj.length>0){
+                        responseObj.forEach(function(item){
+                            vm.serviceNodes.push({label: item.name,
+                                nodeKey: item.name,
+                                serviceCount:item.services ,
+                                header: 'root',
+                                lazy: true})
+                        })
+                    }
+
+                 }});
+
+            this.$nextTick(()=>{
+
+            })
+
+
+
+    }
+})
